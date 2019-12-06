@@ -29,7 +29,9 @@ fun distanceToClosestIntersectionWithStepCount(input: Pair<String, String>): Int
         .drop(1)
         .toSet().intersect(secondWirePath.toSet())
         .map { it.first.absoluteValue + it.second.absoluteValue }
-        .reduce { acc, i -> if (i < acc) i else acc }
+            .takeIf { it.isNotEmpty() }
+        ?.reduce { acc, i -> if (i < acc) i else acc }
+            ?: -1
 }
 
 fun getPathWithStepCount(input: String): List<Triple<Int, Int, Int>> {
