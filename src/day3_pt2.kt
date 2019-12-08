@@ -1,7 +1,7 @@
 import java.io.File
 import kotlin.math.absoluteValue
 
-fun main() {
+fun main(args: Array<String>) {
     println("First test passes: ${distanceToClosestIntersectionWithStepCount(
         Pair(
             "R8,U5,L5,D3",
@@ -9,7 +9,7 @@ fun main() {
     ) == 30}")
     println("Second test passes: ${distanceToClosestIntersectionWithStepCount(
         Pair(
-            "R75,D30,R83,U83,L12,D49,R71,U7,L72", 
+            "R75,D30,R83,U83,L12,D49,R71,U7,L72",
             "U62,R66,U55,R34,D71,R55,D58,R83")
     ) == 610}")
     println("Third test passes: ${distanceToClosestIntersectionWithStepCount(
@@ -25,24 +25,39 @@ fun distanceToClosestIntersectionWithStepCount(input: Pair<String, String>): Int
     val firstWirePath = getPathWithStepCount(input.first)
     val secondWirePath = getPathWithStepCount(input.second)
 
-    return firstWirePath
-        .drop(1)
-        .toSet().intersect(secondWirePath.toSet())
-        .map { it.first.absoluteValue + it.second.absoluteValue }
-            .takeIf { it.isNotEmpty() }
-        ?.reduce { acc, i -> if (i < acc) i else acc }
-            ?: -1
+    val crossings = firstWirePath.path
+            .drop(1)
+            .toSet().intersect(secondWirePath.path.toSet())
+
+    println(crossings)
+    println(crossings.map { firstWirePath.stepCountMap[it]!! + secondWirePath.stepCountMap[it]!! })
+
+    return crossings
+        .map { firstWirePath.stepCountMap[it]!! + secondWirePath.stepCountMap[it]!! }
+            .sorted().first()
 }
 
-fun getPathWithStepCount(input: String): List<Triple<Int, Int, Int>> {
+data class PathWithStepCountMap(val path: List<Pair<Int, Int>>, val stepCountMap: Map<Pair<Int, Int>, Int>)
+
+fun getPathWithStepCount(input: String): PathWithStepCountMap {
     val path = mutableListOf(Triple(0, 0, 0))
-    return input.split(",").flatMapTo(path, {
+    input.split(",").flatMapTo(path) {
         plotPathWithStepCount(
             path.last(),
             it.drop(1).toInt(),
             Direction.valueOf(it[0].toString())
         )
-    })
+    }
+    val map = mutableMapOf<Pair<Int, Int>, Int>()
+    return PathWithStepCountMap(path.mapIndexed { idx, it ->
+        val key = Pair(it.first, it.second)
+        println("Key: $key, path length: ${it.third}")
+        println(map)
+        if (!map.containsKey(key) || idx < map[key]!!) {
+            map[key] = idx
+        }
+        key
+        }, map)
 }
 
 fun plotPathWithStepCount(startLocation: Triple<Int, Int, Int>, distance: Int, direction: Direction): List<Triple<Int, Int, Int>> {

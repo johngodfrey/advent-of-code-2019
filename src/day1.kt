@@ -1,6 +1,6 @@
 import java.io.File
 
-fun main() {
+fun main(args: Array<String>) {
     println("Part one: ${partOne()}")
     println("Part two: ${partTwo()}")
 }

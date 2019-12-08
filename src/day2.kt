@@ -1,6 +1,6 @@
 import java.io.File
 
-fun main() {
+fun main(args: Array<String>) {
     val input = File("input_day2").readText()
     println("Using puzzle input gives ${compute(input)}")
     println("part2Compute(): ${part2Compute(input)}")

@@ -1,7 +1,7 @@
 import java.io.File
 import kotlin.math.absoluteValue
 
-fun main() {
+fun main(args: Array<String>) {
     println("First test passes: ${distanceToClosestIntersection(
         Pair(
             "R8,U5,L5,D3",
