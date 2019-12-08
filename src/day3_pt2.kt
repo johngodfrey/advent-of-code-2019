@@ -1,5 +1,4 @@
 import java.io.File
-import kotlin.math.absoluteValue
 
 fun main(args: Array<String>) {
     println("First test passes: ${distanceToClosestIntersectionWithStepCount(
@@ -17,8 +16,8 @@ fun main(args: Array<String>) {
             "R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51",
             "U98,R91,D20,R16,D67,R40,U7,R15,U6,R7")
     ) == 410}")
-    // val input = File("input_day3").useLines { it.toList() }
-    // println("From input we get: ${distanceToClosestIntersectionWithStepCount(Pair(input[0], input[1]))}")
+     val input = File("input_day3").useLines { it.toList() }
+     println("From input we get: ${distanceToClosestIntersectionWithStepCount(Pair(input[0], input[1]))}")
 }
 
 fun distanceToClosestIntersectionWithStepCount(input: Pair<String, String>): Int {
@@ -29,9 +28,6 @@ fun distanceToClosestIntersectionWithStepCount(input: Pair<String, String>): Int
             .drop(1)
             .toSet().intersect(secondWirePath.path.toSet())
 
-    println(crossings)
-    println(crossings.map { firstWirePath.stepCountMap[it]!! + secondWirePath.stepCountMap[it]!! })
-
     return crossings
         .map { firstWirePath.stepCountMap[it]!! + secondWirePath.stepCountMap[it]!! }
             .sorted().first()
@@ -40,9 +36,9 @@ fun distanceToClosestIntersectionWithStepCount(input: Pair<String, String>): Int
 data class PathWithStepCountMap(val path: List<Pair<Int, Int>>, val stepCountMap: Map<Pair<Int, Int>, Int>)
 
 fun getPathWithStepCount(input: String): PathWithStepCountMap {
-    val path = mutableListOf(Triple(0, 0, 0))
+    val path = mutableListOf(Pair(0, 0))
     input.split(",").flatMapTo(path) {
-        plotPathWithStepCount(
+        plotPath(
             path.last(),
             it.drop(1).toInt(),
             Direction.valueOf(it[0].toString())
@@ -51,22 +47,9 @@ fun getPathWithStepCount(input: String): PathWithStepCountMap {
     val map = mutableMapOf<Pair<Int, Int>, Int>()
     return PathWithStepCountMap(path.mapIndexed { idx, it ->
         val key = Pair(it.first, it.second)
-        println("Key: $key, path length: ${it.third}")
-        println(map)
         if (!map.containsKey(key) || idx < map[key]!!) {
             map[key] = idx
         }
         key
         }, map)
-}
-
-fun plotPathWithStepCount(startLocation: Triple<Int, Int, Int>, distance: Int, direction: Direction): List<Triple<Int, Int, Int>> {
-    var counterX = startLocation.first
-    var counterY = startLocation.second
-    return when (direction) {
-        Direction.R -> List(distance) { Triple(++counterX, counterY, startLocation.third + distance) }
-        Direction.L -> List(distance) { Triple(--counterX, counterY, startLocation.third + distance) }
-        Direction.U -> List(distance) { Triple(counterX, ++counterY, startLocation.third + distance) }
-        Direction.D -> List(distance) { Triple(counterX, --counterY, startLocation.third + distance) }
-    }
 }

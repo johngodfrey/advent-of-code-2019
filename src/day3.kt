@@ -38,13 +38,13 @@ enum class Direction {
 
 fun getPath(input: String): List<Pair<Int, Int>> {
     val path = mutableListOf(Pair(0, 0))
-    return input.split(",").flatMapTo(path, {
+    return input.split(",").flatMapTo(path) {
         plotPath(
             path.last(),
             it.drop(1).toInt(),
             Direction.valueOf(it[0].toString())
         )
-    })
+    }
 }
 
 fun plotPath(startLocation: Pair<Int, Int>, distance: Int, direction: Direction): List<Pair<Int, Int>> {
