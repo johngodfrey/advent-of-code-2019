@@ -7,18 +7,18 @@ fun main(args: Array<String>) {
 
 fun partOne(): Int {
     val input = File("input").useLines { it.toList() }
-    return input.fold(0, {acc, str ->
+    return input.fold(0) {acc, str ->
         val mass = str.toInt()
         acc + (mass / 3) - 2
-    })
+    }
 }
 
 fun partTwo(testAmt: String? = null): Int {
     val input = if (testAmt != null) listOf(testAmt) else File("input").useLines { it.toList() }
-    return input.fold(0, {acc, str ->
+    return input.fold(0) {acc, str ->
         val mass = str.toInt()
         getFuelForMass(mass) + acc
-    })
+    }
 }
 
 fun getFuelForMass(mass: Int): Int {
