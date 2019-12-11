@@ -57,3 +57,4 @@ libraries/tools/kotlin-source-map-loader/lib/
 local.properties
 /lib
 .gitignore
+.idea/
