@@ -14,12 +14,11 @@ enum class Op {
 
 tailrec fun recurseCompute2(tape: List<Int>, offset: Int, input: Int): List<Int> {
     val opcode = tape[offset]
-    // println("opcode: $opcode, offset: $offset")
     if (opcode == 99) {
         return tape
     }
 
-    val result = when (opcode.rem(10)) {
+    val result = when (opcode % 10) {
         1 -> operation(Op.ADD, opcode / 100, offset, tape)
         2 -> operation(Op.MUL, opcode / 100, offset, tape)
         3 -> input
@@ -27,28 +26,27 @@ tailrec fun recurseCompute2(tape: List<Int>, offset: Int, input: Int): List<Int>
         5, 6 -> 0
         7 -> comparison(Sign.LESS_THAN, opcode / 100, offset, tape)
         8 -> comparison(Sign.EQUALS, opcode / 100, offset, tape)
-        else -> throw Exception("Unknown opcode: ${opcode.rem( 10)}")
+        else -> throw Exception("Unknown opcode: ${opcode % 10}")
     }
 
     val tapeModified = tape.toMutableList()
-    when (opcode.rem(10)) {
+    when (opcode % 10) {
         1, 2, 7, 8 -> tapeModified[tape[offset + 3]] = result
         3 -> tapeModified[tape[offset + 1]] = result
         4 -> println(result)
     }
-    return recurseCompute2(tapeModified, when (opcode.rem(10)) {
+    return recurseCompute2(tapeModified, when (opcode % 10) {
         1, 2, 7, 8 -> offset + 4
         3, 4 -> offset + 2
-        5 -> branch(5, offset, opcode / 100, tape)
-        6 -> branch(6, offset, opcode / 100, tape)
-        else -> throw Exception("Unknown opcode: ${opcode.rem(10)}")
+        5 -> branch(true, offset, opcode / 100, tape)
+        6 -> branch(false, offset, opcode / 100, tape)
+        else -> throw Exception("Unknown opcode: ${opcode % 10}")
     }, input)
 }
 
 fun operation(type: Op, mode: Int, offset: Int, input: List<Int>): Int {
-    val operand1 = if (mode.rem(10) == 1) input[offset + 1] else input[input[offset + 1]]
-    val operand2 = if (mode / 10 == 1) input[offset + 2] else input[input[offset + 2]]
-    // println("About to return, $operand1 ${if (type == Op.ADD) "+" else "*"} $operand2")
+    val operand1 = getPositionalOrImmediateOperand(mode % 10, input, offset + 1)
+    val operand2 = getPositionalOrImmediateOperand(mode / 10, input, offset + 2)
     return when (type) {
         Op.ADD -> operand1 + operand2
         Op.MUL -> operand1 * operand2
@@ -60,11 +58,21 @@ enum class Sign {
 }
 
 fun comparison(type: Sign, mode: Int, offset: Int, input: List<Int>): Int {
-    // compute whether params are set to return 1 or just . . .
-    return 0
+    val operand1 = getPositionalOrImmediateOperand(mode % 10, input, offset + 1)
+    val operand2 = getPositionalOrImmediateOperand(mode / 10, input, offset + 2)
+    return when (type) {
+        Sign.LESS_THAN -> if (operand1 < operand2) 1 else 0
+        Sign.EQUALS -> if (operand1 == operand2)1 else 0
+    }
 }
 
-fun branch(opcode: Int, offset: Int, mode: Int, input: List<Int>): Int {
-    // compute whether to jump to a new position or just . . .
-    return offset + 2
+fun getPositionalOrImmediateOperand(modeDigit: Int, input: List<Int>, offset: Int): Int {
+    return if (modeDigit == 1) input[offset] else input[input[offset]]
+}
+
+fun branch(predicate: Boolean, offset: Int, mode: Int, input: List<Int>): Int {
+    val operand1 = getPositionalOrImmediateOperand(mode % 10, input, offset + 1)
+    val operand2 = getPositionalOrImmediateOperand(mode / 10, input, offset + 2)
+    if ((operand1 != 0 && predicate) || (operand1 == 0 && !predicate)) return operand2
+    return offset + 3
 }
