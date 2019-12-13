@@ -18,30 +18,28 @@ fun main(args: Array<String>) {
 }
 
 fun getSumOfOrbits(data: List<String>): Int {
-    var orbitingObjects = data.map {
+    val orbitingObjects = data.map {
         val objects = it.split(")")
         OrbitingObject(objects.last(), objects.first())
     }
-    var distancesToCom = mapOf<String, Int>()
-    while (orbitingObjects.isNotEmpty()) {
-        val result = findPathLengthsToCom(distancesToCom, orbitingObjects)
-        distancesToCom = result.first
-        orbitingObjects = result.second
-    }
-    return distancesToCom.values.sum()
+    return findPathLengthsToCom(orbitingObjects, emptyMap()).values.sum()
 }
 
 data class OrbitingObject(val name: String, val parent: String)
 
-fun findPathLengthsToCom(distancesToCom: Map<String, Int>,
-                         remainingObjects: List<OrbitingObject>): Pair<Map<String, Int>, List<OrbitingObject>> {
+tailrec fun findPathLengthsToCom(
+        remainingObjects: List<OrbitingObject>,
+        distancesToCom: Map<String, Int>
+    ): Map<String, Int> {
+    if (remainingObjects.isEmpty()) return distancesToCom
     val orbitingObject = remainingObjects.first()
     if (orbitingObject.parent == "COM") {
-        return Pair(distancesToCom + Pair(orbitingObject.name, 1), remainingObjects.drop(1))
+        return findPathLengthsToCom(remainingObjects.drop(1),
+                distancesToCom + Pair(orbitingObject.name, 1))
     }
     if (distancesToCom.containsKey(orbitingObject.parent)) {
-        return Pair(distancesToCom + Pair(orbitingObject.name, distancesToCom.getValue(orbitingObject.parent) + 1),
-                remainingObjects.drop(1))
+        return findPathLengthsToCom(remainingObjects.drop(1), distancesToCom + Pair(orbitingObject.name,
+                distancesToCom.getValue(orbitingObject.parent) + 1))
     }
-    return Pair(distancesToCom, remainingObjects.drop(1) + listOf(orbitingObject))
+    return findPathLengthsToCom(remainingObjects.drop(1) + listOf(orbitingObject), distancesToCom)
 }
