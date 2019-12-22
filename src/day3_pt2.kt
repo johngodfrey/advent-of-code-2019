@@ -29,7 +29,7 @@ fun distanceToClosestIntersectionWithStepCount(input: Pair<String, String>): Int
             .toSet().intersect(secondWirePath.path.toSet())
 
     return crossings
-        .map { firstWirePath.stepCountMap[it]!! + secondWirePath.stepCountMap[it]!! }
+        .map { firstWirePath.stepCountMap.getValue(it) + secondWirePath.stepCountMap.getValue(it) }
             .sorted().first()
 }
 
@@ -47,7 +47,7 @@ fun getPathWithStepCount(input: String): PathWithStepCountMap {
     val map = mutableMapOf<Pair<Int, Int>, Int>()
     return PathWithStepCountMap(path.mapIndexed { idx, it ->
         val key = Pair(it.first, it.second)
-        if (!map.containsKey(key) || idx < map[key]!!) {
+        if (!map.containsKey(key) || idx < map.getValue(key)) {
             map[key] = idx
         }
         key
