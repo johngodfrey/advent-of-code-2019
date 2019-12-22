@@ -15,7 +15,6 @@ fun testSingly(numStr: String) : Boolean {
 
 fun hasOnlyTwoConsecutiveDigits(numStr: CharArray): Boolean {
     return numStr.foldIndexed(false) {idx, acc, ch ->
-        // println("Considering $ch at index $idx, acc is $acc")
         when{
             idx == 0 -> (ch == numStr[idx + 1] && ch != numStr[idx + 2]) || acc
             idx < numStr.size - 2 -> (ch == numStr[idx + 1] && ch != numStr[idx + 2] && ch != numStr[idx - 1]) || acc
